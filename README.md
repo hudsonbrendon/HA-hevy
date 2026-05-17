@@ -1,136 +1,212 @@
 # Hevy Integration for Home Assistant
 
 [![Lint](https://github.com/hudsonbrendon/HA-hevy/actions/workflows/lint.yml/badge.svg)](https://github.com/hudsonbrendon/HA-hevy/actions/workflows/lint.yml)
+[![Test](https://github.com/hudsonbrendon/HA-hevy/actions/workflows/test.yml/badge.svg)](https://github.com/hudsonbrendon/HA-hevy/actions/workflows/test.yml)
 [![Validate](https://github.com/hudsonbrendon/HA-hevy/actions/workflows/validate.yml/badge.svg)](https://github.com/hudsonbrendon/HA-hevy/actions/workflows/validate.yml)
+[![HACS](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/hacs/integration)
+[![Release](https://img.shields.io/github/release/hudsonbrendon/HA-hevy.svg)](https://github.com/hudsonbrendon/HA-hevy/releases)
 
 ![Hevy Logo](logo.png)
 
-This custom component integrates Hevy workout tracking with Home Assistant, allowing you to monitor your fitness data directly in your smart home dashboard.
+Bring your [Hevy](https://hevy.com) workout tracker into Home Assistant: dashboards, automations, calendar, and event triggers for every completed lift.
 
-## Features
+> **Requires a Hevy Pro account** — the Hevy public API is currently Pro-only. Get your key at <https://hevy.com/settings?developer>.
 
-- Display your total workout count from Hevy
-- Track workout frequency and consistency
-- Monitor recent workouts and activities
-- Access workout details including duration, exercises, and volume
-- Create automations based on your workout data
-- View historical workout trends
-- Multi-language support (English, Portuguese)
-
-## How It Works
-
-The integration connects to the Hevy API using your personal API key and retrieves your workout data. This data is then made available as sensors in Home Assistant that you can use in dashboards, automations, or scripts. The integration updates periodically to ensure your data is current.
+---
 
 ## Installation
 
-### HACS (Recommended)
+### HACS (recommended)
 
-1. Make sure [HACS](https://hacs.xyz/) is installed in your Home Assistant instance.
-2. Search for "Hevy" in the HACS Store integration tab.
-3. Click Install on the Hevy integration.
-4. Restart Home Assistant.
+1. Ensure [HACS](https://hacs.xyz/) is installed.
+2. HACS → Integrations → search **Hevy** → Install.
+3. Restart Home Assistant.
 
-### Manual Installation
+### Manual
 
-1. Download the latest release from GitHub.
-2. Extract and copy the `custom_components/hevy` folder to your Home Assistant's `custom_components` directory.
+1. Download the [latest release](https://github.com/hudsonbrendon/HA-hevy/releases).
+2. Copy `custom_components/hevy/` into your HA `custom_components/` directory.
 3. Restart Home Assistant.
 
 ## Configuration
 
-1. Go to Home Assistant's Configuration > Integrations.
-2. Click the "+ Add Integration" button and search for "Hevy".
-3. Follow the setup wizard to enter your Hevy API key.
-4. Configure the update interval and select which data points you want to track.
-5. Once configured, the integration will create several sensors that you can add to your dashboards.
+1. **Settings → Devices & Services → Add Integration** → search **Hevy**.
+2. Paste your API key and pick a name for the device.
+3. Done — sensors, binary sensors, and the calendar entity are created automatically.
 
-## Obtaining your API Key
+---
 
-To use this integration, you'll need your Hevy API key:
+## Entity reference
 
-1. Log into your Hevy account on the web or mobile app
-2. Navigate to Account Settings > API Access
-3. Generate a new API key if you don't already have one
-4. Copy this key for use in the Home Assistant integration
+### Aggregate sensors (one set per integration entry)
 
-Example API request using your key:
-```
-curl -X 'GET' \
-  'https://api.hevyapp.com/v1/workouts/count' \
-  -H 'accept: application/json' \
-  -H 'api-key: YOUR_API_KEY_HERE'
-```
+| Entity | Unit | Description |
+|---|---|---|
+| `sensor.hevy_<name>_workout_count` | — | Total workouts on the account |
+| `sensor.hevy_<name>_today_count` | — | Workouts completed today |
+| `sensor.hevy_<name>_this_weeks_workouts` | — | Workouts in the last 7 days |
+| `sensor.hevy_<name>_this_months_workouts` | — | Workouts in the current month |
+| `sensor.hevy_<name>_this_years_workouts` | — | Workouts in the current year |
+| `sensor.hevy_<name>_last_workout` | — | Title of the most recent workout (attrs: `exercise_count`, `total_reps`) |
+| `sensor.hevy_<name>_last_workout_start` | timestamp | When the last workout started |
+| `sensor.hevy_<name>_last_workout_duration` | min | Duration of the last workout |
+| `sensor.hevy_<name>_last_workout_volume` | kg | Total weight × reps in the last workout |
+| `sensor.hevy_<name>_volume_today` | kg | Total volume lifted today |
+| `sensor.hevy_<name>_volume_this_week` | kg | Total volume in the last 7 days |
+| `sensor.hevy_<name>_volume_this_month` | kg | Total volume this month |
+| `sensor.hevy_<name>_volume_this_year` | kg | Total volume this year |
+| `sensor.hevy_<name>_training_time_today` | min | Minutes trained today |
+| `sensor.hevy_<name>_training_time_this_week` | min | Minutes trained in the last 7 days |
+| `sensor.hevy_<name>_training_time_this_month` | min | Minutes trained this month |
+| `sensor.hevy_<name>_current_streak` | days | Consecutive days with a workout (today or yesterday counted) |
+| `sensor.hevy_<name>_longest_streak` | days | Best historical streak from cached workouts |
+| `sensor.hevy_<name>_unique_exercises_7d` | — | Distinct exercise templates in the last 7 days |
+| `sensor.hevy_<name>_unique_exercises_30d` | — | Distinct exercise templates in the last 30 days |
+| `sensor.hevy_<name>_body_weight` | kg | Latest body weight measurement (attr: `date`) |
+| `sensor.hevy_<name>_body_fat` | % | Latest body fat percentage |
+| `sensor.hevy_<name>_lean_mass` | kg | Latest lean mass measurement |
+| `sensor.hevy_<name>_user` | — | Hevy user display name (attrs: `user_id`, `profile_url`) |
 
-## Available Entities
+### Binary sensors
 
-After setting up the integration, the following entities will be available:
+| Entity | Description |
+|---|---|
+| `binary_sensor.hevy_<name>_workout_today` | `on` if any workout started today |
+| `binary_sensor.hevy_<name>_workout_this_week` | `on` if any workout started in the last 7 days |
 
-### Sensor Entities
-- `sensor.hevy_workout_count`: Total number of workouts recorded
-- `sensor.hevy_today_count`: Number of workouts completed today
-- `sensor.hevy_week_count`: Number of workouts completed this week
-- `sensor.hevy_month_count`: Number of workouts completed this month
-- `sensor.hevy_year_count`: Number of workouts completed this year
+### Per-workout entities
 
-### Binary Sensor Entities
-- `binary_sensor.hevy_workout_today`: Indicates if a workout was completed today (on/off)
-- `binary_sensor.hevy_workout_this_week`: Indicates if any workouts were completed in the last 7 days (on/off)
+For each of the 10 most recent workouts:
 
-### Workout-Specific Entities
-For each workout in your history, the following entities are created:
-- `sensor.hevy_workout_date`: Timestamp when the workout was performed
-- Exercise-specific sensors showing the maximum weight used for each exercise (e.g., `sensor.bench_press`)
+- `sensor.hevy_<name>_workout_date` — start time (TIMESTAMP).
+- One sensor per exercise titled after the exercise (e.g. `sensor.bench_press`). State is the max weight in kg; attrs: `sets`, `total_reps`, `volume_kg`.
 
-Each exercise sensor includes additional attributes:
-- `sets`: Number of sets performed
-- `total_reps`: Total repetitions across all sets
+### Calendar
 
-## Usage Examples
+| Entity | Description |
+|---|---|
+| `calendar.hevy_<name>_workouts` | Each cached workout as a CalendarEvent. Drop into a calendar card or use as a trigger source. |
 
-### Dashboard Card Example
+---
+
+## Events fired
+
+The integration fires events on every poll cycle (default 60 min) when the workout cache changes.
+
+| Event | When | Payload |
+|---|---|---|
+| `hevy_workout_completed` | A workout id newly appears in the cache | `id`, `title`, `start_time` (ISO), `duration_min`, `volume_kg`, `total_reps`, `exercise_count` |
+| `hevy_workout_deleted` | A previously cached workout id disappears | `id`, `title` |
+
+The first refresh after startup is silent — events fire only for diffs against the previous poll.
+
+---
+
+## Automation examples
+
+### Notify when you complete a workout
+
 ```yaml
-type: entities
+automation:
+  - alias: Hevy — workout completed notification
+    trigger:
+      - platform: event
+        event_type: hevy_workout_completed
+    action:
+      - service: notify.mobile_app_my_phone
+        data:
+          title: "💪 Workout logged"
+          message: >-
+            {{ trigger.event.data.title }}
+            • {{ trigger.event.data.duration_min }} min
+            • {{ trigger.event.data.volume_kg }} kg total
+```
+
+### Play a workout playlist when a session starts
+
+```yaml
+automation:
+  - alias: Hevy — start workout playlist
+    trigger:
+      - platform: event
+        event_type: hevy_workout_completed
+    condition:
+      - condition: time
+        after: "06:00:00"
+        before: "10:00:00"
+    action:
+      - service: media_player.play_media
+        target:
+          entity_id: media_player.living_room
+        data:
+          media_content_id: spotify:playlist:your_id
+          media_content_type: playlist
+```
+
+### Streak alert if you skip 3 days
+
+```yaml
+automation:
+  - alias: Hevy — streak about to break
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.hevy_hudson_current_streak
+        below: 1
+        for: "72:00:00"
+    action:
+      - service: notify.mobile_app_my_phone
+        data:
+          message: "Streak broken — get back in the gym 🏋️"
+```
+
+### Weekly volume gauge card
+
+```yaml
+type: gauge
+entity: sensor.hevy_hudson_volume_this_week
+unit: kg
+min: 0
+max: 15000
+severity:
+  green: 8000
+  yellow: 4000
+  red: 0
+```
+
+### Workout calendar card
+
+```yaml
+type: calendar
 entities:
-  - sensor.hevy_workout_count
-  - sensor.hevy_last_workout_date
-  - sensor.hevy_weekly_workout_count
-title: My Fitness Tracking
+  - calendar.hevy_hudson_workouts
 ```
 
-### Automation Example
-```yaml
-alias: Workout Reminder
-description: Remind me if I haven't worked out in 3 days
-trigger:
-  - platform: template
-    value_template: >
-      {% set last = states('sensor.hevy_last_workout_date') | as_datetime %}
-      {% set days = ((now() - last).total_seconds() / 86400) | round(1) %}
-      {{ days > 3 }}
-action:
-  - service: notify.mobile_app
-    data:
-      message: It's been {{ days }} days since your last workout!
-```
+---
+
+## How polling works
+
+- Default refresh interval: **60 minutes**.
+- Each refresh fetches in parallel: `/workouts/count`, `/workouts` (10 most recent), `/user/info`, `/body_measurements`.
+- Optional endpoints (user, measurements) fail gracefully — sensors degrade to `unknown` without taking the integration down.
+- Authentication failures trigger HA's reauth flow.
 
 ## Troubleshooting
 
-- **No data appearing**: Verify your API key is correct and that you have workouts in your Hevy account
-- **Integration offline**: Check your internet connection and ensure Hevy's API is accessible
-- **Update delays**: The data refreshes according to your configured interval; you can trigger a manual refresh from the integration page
+| Symptom | Likely cause / fix |
+|---|---|
+| Setup fails with auth error | Verify your key at <https://hevy.com/settings?developer> and re-add. Pro account required. |
+| No `body_*` sensors update | You haven't logged any body measurements in Hevy yet. |
+| Calendar empty | Only the 10 most recent workouts are cached. Train more 😉. |
+| Events don't fire | First refresh after restart is silent. Wait one poll cycle (default 60 min). |
 
 ## Contributing
 
-If you'd like to contribute to the integration, please check out our [contribution guidelines](CONTRIBUTING.md).
+Issues and PRs welcome. The repo has:
+- `ruff check .` + `ruff format .` for linting.
+- `pytest tests/` for the test suite (140+ tests, no HA install needed — uses lightweight stubs).
+- CI runs all three workflows on every PR.
 
-**Important for repository maintainers:** HACS validation requires specific repository topics to be set. If you fork or create your own version, make sure to set these GitHub repository topics:
-- `homeassistant`
-- `home-assistant`
-- `hacs-integration`
-- `hevy`
-- `fitness`
-- `workout`
-- `tracking`
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full contribution guide.
 
 ***
 
