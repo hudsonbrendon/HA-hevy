@@ -20,39 +20,40 @@
     },
     "entity": {
         "sensor": {
-            "workout_count": {
-                "name": "Workout Count"
-            },
-            "today_count": {
-                "name": "Today's Workouts"
-            },
-            "week_count": {
-                "name": "This Week's Workouts"
-            },
-            "month_count": {
-                "name": "This Month's Workouts"
-            },
-            "year_count": {
-                "name": "This Year's Workouts"
-            },
-            "workout_date": {
-                "name": "Workout Date"
-            }
+            "workout_count": {"name": "Workout Count"},
+            "today_count": {"name": "Today's Workouts"},
+            "week_count": {"name": "This Week's Workouts"},
+            "month_count": {"name": "This Month's Workouts"},
+            "year_count": {"name": "This Year's Workouts"},
+            "workout_date": {"name": "Workout Date"},
+            "last_workout_title": {"name": "Last Workout"},
+            "last_workout_start": {"name": "Last Workout Start"},
+            "last_workout_duration": {"name": "Last Workout Duration"},
+            "last_workout_volume": {"name": "Last Workout Volume"},
+            "volume_today": {"name": "Volume Today"},
+            "volume_week": {"name": "Volume This Week"},
+            "volume_month": {"name": "Volume This Month"},
+            "volume_year": {"name": "Volume This Year"},
+            "duration_today": {"name": "Training Time Today"},
+            "duration_week": {"name": "Training Time This Week"},
+            "duration_month": {"name": "Training Time This Month"},
+            "current_streak_days": {"name": "Current Streak"},
+            "longest_streak_days": {"name": "Longest Streak"},
+            "unique_exercises_7d": {"name": "Unique Exercises (7d)"},
+            "unique_exercises_30d": {"name": "Unique Exercises (30d)"},
+            "body_weight": {"name": "Body Weight"},
+            "body_fat_percent": {"name": "Body Fat"},
+            "lean_mass": {"name": "Lean Mass"},
+            "user_name": {"name": "User"}
         },
         "binary_sensor": {
             "workout_today": {
                 "name": "Workout Today",
-                "state": {
-                    "on": "Yes",
-                    "off": "No"
-                }
+                "state": {"on": "Yes", "off": "No"}
             },
             "workout_this_week": {
                 "name": "Workout This Week",
-                "state": {
-                    "on": "Yes",
-                    "off": "No"
-                }
+                "state": {"on": "Yes", "off": "No"}
             }
         }
     }
