@@ -21,6 +21,7 @@ HevyConfigEntry = ConfigEntry
 PLATFORMS: list[Platform] = [
     Platform.SENSOR,
     Platform.BINARY_SENSOR,
+    Platform.CALENDAR,
 ]
 
 
