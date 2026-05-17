@@ -14,7 +14,13 @@ from .api import (
     HevyApiClientAuthenticationError,
     HevyApiClientError,
 )
-from .const import DEFAULT_WORKOUTS_COUNT, DOMAIN, LOGGER
+from .const import (
+    DEFAULT_WORKOUTS_COUNT,
+    DOMAIN,
+    EVENT_WORKOUT_COMPLETED,
+    EVENT_WORKOUT_DELETED,
+    LOGGER,
+)
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
@@ -40,6 +46,20 @@ def _workout_duration_seconds(workout: dict[str, Any]) -> float:
     except (TypeError, ValueError):
         return 0.0
     return max(0.0, (end - start).total_seconds())
+
+
+def _event_payload(record: dict[str, Any]) -> dict[str, Any]:
+    """Build the HA event payload for a workout record."""
+    start = record.get("start_time")
+    return {
+        "id": record.get("id"),
+        "title": record.get("title"),
+        "start_time": start.isoformat() if start else None,
+        "duration_min": round((record.get("duration_seconds") or 0) / 60, 1),
+        "volume_kg": round(record.get("volume_kg") or 0, 1),
+        "total_reps": record.get("total_reps", 0),
+        "exercise_count": record.get("exercise_count", 0),
+    }
 
 
 def _compute_streaks(workout_dates: set[date], today: date) -> tuple[int, int]:
@@ -94,6 +114,7 @@ class HevyDataUpdateCoordinator(DataUpdateCoordinator):
         )
         self.name = name
         self.data: dict[str, Any] = {}
+        self._primed = False
 
     async def _async_update_data(self) -> dict[str, Any]:
         """Update data via library."""
@@ -115,9 +136,36 @@ class HevyDataUpdateCoordinator(DataUpdateCoordinator):
         except HevyApiClientError as exception:
             raise UpdateFailed(exception) from exception
 
-        return self._build_state(
+        previous_workouts = self.data.get("workouts", {}) if self.data else {}
+        new_state = self._build_state(
             workout_count_data, workouts_data, user_data, measurements_data
         )
+        self._fire_workout_events(previous_workouts, new_state["workouts"])
+        self._primed = True
+        return new_state
+
+    def _fire_workout_events(
+        self,
+        previous: dict[str, dict[str, Any]],
+        current: dict[str, dict[str, Any]],
+    ) -> None:
+        """Fire HA events for workouts added/removed since the last poll."""
+        # First successful refresh primes the cache without firing events so
+        # the integration doesn't spam HA on startup with one event per
+        # cached workout.
+        if not self._primed:
+            return
+        for workout_id, record in current.items():
+            if workout_id not in previous:
+                self.hass.bus.async_fire(
+                    EVENT_WORKOUT_COMPLETED, _event_payload(record)
+                )
+        for workout_id, record in previous.items():
+            if workout_id not in current:
+                self.hass.bus.async_fire(
+                    EVENT_WORKOUT_DELETED,
+                    {"id": workout_id, "title": record.get("title")},
+                )
 
     def _build_state(
         self,
