@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import sys
 import types
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -31,12 +32,90 @@ class _StubDataUpdateCoordinator:
         self.update_interval = update_interval
 
 
+class _StubCoordinatorEntity:
+    """Minimal stand-in for CoordinatorEntity.
+
+    Generic subscript like CoordinatorEntity[HevyDataUpdateCoordinator] is
+    supported via __class_getitem__ so the import works at class-definition
+    time.
+    """
+
+    def __init__(self, coordinator: Any) -> None:
+        self.coordinator = coordinator
+
+    def __class_getitem__(cls, _item: Any) -> type:
+        return cls
+
+
 class _StubUpdateFailed(Exception):
     """Stub for UpdateFailed."""
 
 
 class _StubConfigEntryAuthFailed(Exception):
     """Stub for ConfigEntryAuthFailed."""
+
+
+class _StubEntityCategory:
+    DIAGNOSTIC = "diagnostic"
+    CONFIG = "config"
+
+
+class _StubBinarySensorDeviceClass:
+    MOTION = "motion"
+    OCCUPANCY = "occupancy"
+
+
+class _StubSensorDeviceClass:
+    WEIGHT = "weight"
+    DURATION = "duration"
+    TIMESTAMP = "timestamp"
+
+
+class _StubSensorStateClass:
+    MEASUREMENT = "measurement"
+    TOTAL_INCREASING = "total_increasing"
+
+
+class _StubUnitOfMass:
+    KILOGRAMS = "kg"
+    POUNDS = "lb"
+
+
+class _StubUnitOfTime:
+    MINUTES = "min"
+    SECONDS = "s"
+
+
+@dataclass(kw_only=True)
+class _StubBaseDescription:
+    """Dataclass base mirroring HA's *EntityDescription so subclasses compose.
+
+    Real HA descriptions use kw_only=True dataclasses; mirroring that lets the
+    @dataclass decorator on HevySensorEntityDescription/etc. merge fields
+    cleanly without ordering errors.
+    """
+
+    key: str = ""
+    translation_key: str | None = None
+    icon: str | None = None
+    name: str | None = None
+    device_class: Any = None
+    state_class: Any = None
+    native_unit_of_measurement: str | None = None
+    entity_category: Any = None
+
+
+class _StubSensorEntity:
+    pass
+
+
+class _StubBinarySensorEntity:
+    pass
+
+
+def _device_info(**kwargs: Any) -> dict[str, Any]:
+    """Stand-in for homeassistant.helpers.device_registry.DeviceInfo."""
+    return dict(kwargs)
 
 
 def _install_ha_stubs() -> None:
@@ -67,18 +146,44 @@ def _install_ha_stubs() -> None:
         "homeassistant.helpers.update_coordinator",
         DataUpdateCoordinator=_StubDataUpdateCoordinator,
         UpdateFailed=_StubUpdateFailed,
+        CoordinatorEntity=_StubCoordinatorEntity,
+    )
+    _mod(
+        "homeassistant.helpers.device_registry",
+        DeviceInfo=_device_info,
+    )
+    _mod(
+        "homeassistant.helpers.entity",
+        EntityCategory=_StubEntityCategory,
     )
     _mod("homeassistant.core", HomeAssistant=object)
     _mod("homeassistant.config_entries", ConfigEntry=object)
     _mod(
         "homeassistant.const",
         Platform=types.SimpleNamespace(SENSOR="sensor", BINARY_SENSOR="binary_sensor"),
+        PERCENTAGE="%",
+        UnitOfMass=_StubUnitOfMass,
+        UnitOfTime=_StubUnitOfTime,
     )
     _mod(
         "homeassistant.helpers.aiohttp_client",
         async_get_clientsession=lambda _hass: None,
     )
     _mod("homeassistant.loader", async_get_integration=lambda *a, **k: None)
+    _pkg("homeassistant.components")
+    _mod(
+        "homeassistant.components.sensor",
+        SensorEntity=_StubSensorEntity,
+        SensorEntityDescription=_StubBaseDescription,
+        SensorDeviceClass=_StubSensorDeviceClass,
+        SensorStateClass=_StubSensorStateClass,
+    )
+    _mod(
+        "homeassistant.components.binary_sensor",
+        BinarySensorEntity=_StubBinarySensorEntity,
+        BinarySensorEntityDescription=_StubBaseDescription,
+        BinarySensorDeviceClass=_StubBinarySensorDeviceClass,
+    )
 
 
 _install_ha_stubs()
@@ -103,7 +208,15 @@ def _register_hevy_package() -> None:
     hevy_pkg.__path__ = [str(pkg_root / "hevy")]
     sys.modules["custom_components.hevy"] = hevy_pkg
 
-    for submodule in ("const", "api", "data", "coordinator"):
+    for submodule in (
+        "const",
+        "api",
+        "data",
+        "coordinator",
+        "entity",
+        "sensor",
+        "binary_sensor",
+    ):
         spec = importlib.util.spec_from_file_location(
             f"custom_components.hevy.{submodule}",
             pkg_root / "hevy" / f"{submodule}.py",
@@ -140,6 +253,13 @@ def freeze_coordinator_clock(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(coord_mod, "datetime", _FrozenDatetime)
 
 
+class _StubConfigEntry:
+    """Minimal stand-in for ConfigEntry used by entity unique_id helpers."""
+
+    def __init__(self, entry_id: str = "entry-123") -> None:
+        self.entry_id = entry_id
+
+
 @pytest.fixture
 def coordinator() -> Any:
     """Build a coordinator instance without running __init__ (no HA needed)."""
@@ -147,6 +267,19 @@ def coordinator() -> Any:
 
     coord = HevyDataUpdateCoordinator.__new__(HevyDataUpdateCoordinator)
     coord.name = "Hudson"
+    return coord
+
+
+@pytest.fixture
+def entity_coordinator() -> Any:
+    """A coordinator wired with `data`, `config_entry`, and update success flag."""
+    from custom_components.hevy.coordinator import HevyDataUpdateCoordinator
+
+    coord = HevyDataUpdateCoordinator.__new__(HevyDataUpdateCoordinator)
+    coord.name = "Hudson"
+    coord.config_entry = _StubConfigEntry()
+    coord.last_update_success = True
+    coord.data = {}
     return coord
 
 
