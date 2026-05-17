@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import TYPE_CHECKING, Any, Final
 
 from homeassistant.components.binary_sensor import (
@@ -47,7 +47,8 @@ WORKOUT_TODAY_DESCRIPTION: Final = HevyBinarySensorEntityDescription(
     entity_category=EntityCategory.DIAGNOSTIC,
     is_on_fn=lambda data: any(
         [
-            workout.get("start_time", datetime.min).date() == datetime.now().date()
+            workout.get("start_time", datetime.min.replace(tzinfo=UTC)).date()
+            == datetime.now(tz=UTC).date()
             for workout in data.get("workouts", {}).values()
         ]
     ),
@@ -61,7 +62,8 @@ WORKOUT_WEEK_DESCRIPTION: Final = HevyBinarySensorEntityDescription(
     entity_category=EntityCategory.DIAGNOSTIC,
     is_on_fn=lambda data: any(
         (
-            datetime.now().date() - workout.get("start_time", datetime.min).date()
+            datetime.now(tz=UTC).date()
+            - workout.get("start_time", datetime.min.replace(tzinfo=UTC)).date()
             < timedelta(days=7)
             for workout in data.get("workouts", {}).values()
         )
