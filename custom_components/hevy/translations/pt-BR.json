@@ -55,6 +55,9 @@
                 "name": "Treinou Esta Semana",
                 "state": {"on": "Sim", "off": "Não"}
             }
+        },
+        "calendar": {
+            "workouts": {"name": "Treinos"}
         }
     }
 }

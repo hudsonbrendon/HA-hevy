@@ -55,6 +55,9 @@
                 "name": "Workout This Week",
                 "state": {"on": "Yes", "off": "No"}
             }
+        },
+        "calendar": {
+            "workouts": {"name": "Workouts"}
         }
     }
 }

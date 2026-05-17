@@ -36,6 +36,7 @@ ignore = [
     "N818",    # internal stub names mirror HA classes
     "ARG005",  # lambda stubs intentionally ignore args
     "PLC0415", # late imports needed after stub injection
+    "PLR0913", # test helper builders may take many fields by design
 ]
 
 [lint.flake8-pytest-style]

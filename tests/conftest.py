@@ -113,6 +113,20 @@ class _StubBinarySensorEntity:
     pass
 
 
+class _StubCalendarEntity:
+    pass
+
+
+@dataclass
+class _StubCalendarEvent:
+    start: Any
+    end: Any
+    summary: str
+    description: str | None = None
+    uid: str | None = None
+    location: str | None = None
+
+
 def _device_info(**kwargs: Any) -> dict[str, Any]:
     """Stand-in for homeassistant.helpers.device_registry.DeviceInfo."""
     return dict(kwargs)
@@ -160,7 +174,11 @@ def _install_ha_stubs() -> None:
     _mod("homeassistant.config_entries", ConfigEntry=object)
     _mod(
         "homeassistant.const",
-        Platform=types.SimpleNamespace(SENSOR="sensor", BINARY_SENSOR="binary_sensor"),
+        Platform=types.SimpleNamespace(
+            SENSOR="sensor",
+            BINARY_SENSOR="binary_sensor",
+            CALENDAR="calendar",
+        ),
         PERCENTAGE="%",
         UnitOfMass=_StubUnitOfMass,
         UnitOfTime=_StubUnitOfTime,
@@ -183,6 +201,11 @@ def _install_ha_stubs() -> None:
         BinarySensorEntity=_StubBinarySensorEntity,
         BinarySensorEntityDescription=_StubBaseDescription,
         BinarySensorDeviceClass=_StubBinarySensorDeviceClass,
+    )
+    _mod(
+        "homeassistant.components.calendar",
+        CalendarEntity=_StubCalendarEntity,
+        CalendarEvent=_StubCalendarEvent,
     )
 
 
@@ -216,6 +239,7 @@ def _register_hevy_package() -> None:
         "entity",
         "sensor",
         "binary_sensor",
+        "calendar",
     ):
         spec = importlib.util.spec_from_file_location(
             f"custom_components.hevy.{submodule}",
