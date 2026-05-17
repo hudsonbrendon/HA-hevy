@@ -69,9 +69,7 @@ class HevyDataUpdateCoordinator(DataUpdateCoordinator):
 
             for workout in workouts_data.get("workouts", []):
                 workout_id = workout["id"]
-                workout_start_time = datetime.fromisoformat(
-                    workout["start_time"].replace("Z", "+00:00")
-                )
+                workout_start_time = datetime.fromisoformat(workout["start_time"])
                 workout_title = workout["title"]
 
                 workout_date = workout_start_time.date()
