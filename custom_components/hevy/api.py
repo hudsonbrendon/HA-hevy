@@ -70,6 +70,23 @@ class HevyApiClient:
             params={"page": page, "pageSize": page_size},
         )
 
+    async def async_get_user_info(self) -> dict[str, Any]:
+        """Get authenticated user info."""
+        return await self._api_wrapper(
+            method="get",
+            url=f"{BASE_URL}/user/info",
+        )
+
+    async def async_get_body_measurements(
+        self, page: int = 1, page_size: int = 10
+    ) -> dict[str, Any]:
+        """Get body measurements (paginated, max 10 per page)."""
+        return await self._api_wrapper(
+            method="get",
+            url=f"{BASE_URL}/body_measurements",
+            params={"page": page, "pageSize": page_size},
+        )
+
     async def _api_wrapper(
         self,
         method: str,

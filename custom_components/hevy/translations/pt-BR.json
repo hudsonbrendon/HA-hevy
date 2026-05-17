@@ -20,39 +20,40 @@
     },
     "entity": {
         "sensor": {
-            "workout_count": {
-                "name": "Contagem de Treinos"
-            },
-            "today_count": {
-                "name": "Treinos de Hoje"
-            },
-            "week_count": {
-                "name": "Treinos desta Semana"
-            },
-            "month_count": {
-                "name": "Treinos deste Mês"
-            },
-            "year_count": {
-                "name": "Treinos deste Ano"
-            },
-            "workout_date": {
-                "name": "Data do Treino"
-            }
+            "workout_count": {"name": "Contagem de Treinos"},
+            "today_count": {"name": "Treinos de Hoje"},
+            "week_count": {"name": "Treinos desta Semana"},
+            "month_count": {"name": "Treinos deste Mês"},
+            "year_count": {"name": "Treinos deste Ano"},
+            "workout_date": {"name": "Data do Treino"},
+            "last_workout_title": {"name": "Último Treino"},
+            "last_workout_start": {"name": "Início do Último Treino"},
+            "last_workout_duration": {"name": "Duração do Último Treino"},
+            "last_workout_volume": {"name": "Volume do Último Treino"},
+            "volume_today": {"name": "Volume de Hoje"},
+            "volume_week": {"name": "Volume desta Semana"},
+            "volume_month": {"name": "Volume deste Mês"},
+            "volume_year": {"name": "Volume deste Ano"},
+            "duration_today": {"name": "Tempo de Treino Hoje"},
+            "duration_week": {"name": "Tempo de Treino na Semana"},
+            "duration_month": {"name": "Tempo de Treino no Mês"},
+            "current_streak_days": {"name": "Sequência Atual"},
+            "longest_streak_days": {"name": "Maior Sequência"},
+            "unique_exercises_7d": {"name": "Exercícios Únicos (7d)"},
+            "unique_exercises_30d": {"name": "Exercícios Únicos (30d)"},
+            "body_weight": {"name": "Peso Corporal"},
+            "body_fat_percent": {"name": "Gordura Corporal"},
+            "lean_mass": {"name": "Massa Magra"},
+            "user_name": {"name": "Usuário"}
         },
         "binary_sensor": {
             "workout_today": {
                 "name": "Treinou Hoje",
-                "state": {
-                    "on": "Sim",
-                    "off": "Não"
-                }
+                "state": {"on": "Sim", "off": "Não"}
             },
             "workout_this_week": {
                 "name": "Treinou Esta Semana",
-                "state": {
-                    "on": "Sim",
-                    "off": "Não"
-                }
+                "state": {"on": "Sim", "off": "Não"}
             }
         }
     }
