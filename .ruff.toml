@@ -23,6 +23,21 @@ ignore = [
     "I001", # Import block is un-sorted or un-formatted
 ]
 
+[lint.per-file-ignores]
+"tests/**" = [
+    "S101",    # assert is fine in tests
+    "ANN",     # don't require full type annotations on test funcs/fixtures
+    "D",       # docstrings optional in tests
+    "SLF001",  # private member access is the whole point of unit tests
+    "PLR2004", # magic numbers are fine in assertions
+    "INP001",  # tests dir is not an implicit namespace package
+    "PT004",   # fixture-without-return-type
+    "FBT001",  # boolean args in fixtures
+    "N818",    # internal stub names mirror HA classes
+    "ARG005",  # lambda stubs intentionally ignore args
+    "PLC0415", # late imports needed after stub injection
+]
+
 [lint.flake8-pytest-style]
 fixture-parentheses = false
 

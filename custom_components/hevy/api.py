@@ -117,6 +117,8 @@ class HevyApiClient:
             raise HevyApiClientCommunicationError(
                 msg,
             ) from exception
+        except HevyApiClientError:
+            raise
         except Exception as exception:  # pylint: disable=broad-except
             msg = f"Something really wrong happened! - {exception}"
             raise HevyApiClientError(
