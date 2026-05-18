@@ -260,6 +260,7 @@ def _install_ha_stubs() -> None:
         "homeassistant.helpers.config_validation",
         string=str,
         date=_parse_date,
+        boolean=bool,
     )
     _mod("homeassistant.core", HomeAssistant=object)
     _mod(

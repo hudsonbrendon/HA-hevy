@@ -61,3 +61,65 @@ refresh:
       example: "abc123def456"
       selector:
         text:
+
+create_workout:
+  name: Create workout
+  description: >
+    POST a completed workout to Hevy. Useful for scripted/automated logging
+    (e.g. tracking treadmill sessions or warmups recorded by another
+    integration). Refreshes the coordinator on success.
+  fields:
+    entry_id:
+      name: Config entry
+      description: ID of the Hevy integration to target (omit if only one is configured).
+      required: false
+      example: "abc123def456"
+      selector:
+        text:
+    title:
+      name: Title
+      required: true
+      example: "Morning Cardio"
+      selector:
+        text:
+    description:
+      name: Description
+      required: false
+      example: "30 min steady state on the treadmill"
+      selector:
+        text:
+          multiline: true
+    start_time:
+      name: Start time (ISO 8601)
+      required: true
+      example: "2026-05-17T07:30:00Z"
+      selector:
+        datetime:
+    end_time:
+      name: End time (ISO 8601)
+      required: true
+      example: "2026-05-17T08:00:00Z"
+      selector:
+        datetime:
+    is_private:
+      name: Private
+      description: Hide the workout from your public Hevy profile.
+      required: false
+      default: false
+      selector:
+        boolean:
+    exercises:
+      name: Exercises
+      description: >
+        List of exercise objects. Each must have exercise_template_id and a
+        sets list. Each set may include type, weight_kg, reps,
+        distance_meters, duration_seconds, custom_metric and rpe.
+      required: true
+      example: |
+        - exercise_template_id: "D04AC939"
+          sets:
+            - type: normal
+              weight_kg: 100
+              reps: 8
+      selector:
+        object:
