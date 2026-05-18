@@ -1,0 +1,63 @@
+log_body_measurement:
+  name: Log body measurement
+  description: >
+    Record a body measurement on Hevy for the given date. If an entry already
+    exists for that date it is overwritten. At least one measurement field is
+    required.
+  fields:
+    entry_id:
+      name: Config entry
+      description: ID of the Hevy integration to target (omit if only one is configured).
+      example: "abc123def456"
+      required: false
+      selector:
+        text:
+    date:
+      name: Date
+      description: Date of the measurement (defaults to today, UTC).
+      required: false
+      example: "2026-05-17"
+      selector:
+        date:
+    weight_kg:
+      name: Weight (kg)
+      example: 82.5
+      required: false
+      selector:
+        number:
+          min: 1
+          max: 500
+          step: 0.1
+          unit_of_measurement: kg
+    fat_percent:
+      name: Body fat (%)
+      example: 18.5
+      required: false
+      selector:
+        number:
+          min: 0
+          max: 100
+          step: 0.1
+          unit_of_measurement: "%"
+    lean_mass_kg:
+      name: Lean mass (kg)
+      example: 65.0
+      required: false
+      selector:
+        number:
+          min: 1
+          max: 500
+          step: 0.1
+          unit_of_measurement: kg
+
+refresh:
+  name: Refresh
+  description: Force the Hevy coordinator to poll the API immediately.
+  fields:
+    entry_id:
+      name: Config entry
+      description: ID of the Hevy integration to target (omit if only one is configured).
+      required: false
+      example: "abc123def456"
+      selector:
+        text:
