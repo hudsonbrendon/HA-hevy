@@ -18,6 +18,18 @@
             "already_configured": "Esta chave de API já está configurada."
         }
     },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Opções do Hevy",
+                "description": "Ajuste a frequência de polling e quantos treinos buscar por ciclo.",
+                "data": {
+                    "scan_interval": "Intervalo de polling (minutos)",
+                    "workouts_count": "Treinos por ciclo (1-10)"
+                }
+            }
+        }
+    },
     "entity": {
         "sensor": {
             "workout_count": {"name": "Contagem de Treinos"},

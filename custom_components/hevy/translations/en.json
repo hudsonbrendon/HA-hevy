@@ -18,6 +18,18 @@
             "already_configured": "This API key is already configured."
         }
     },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Hevy options",
+                "description": "Adjust how often the integration polls the Hevy API and how many workouts to fetch per poll.",
+                "data": {
+                    "scan_interval": "Polling interval (minutes)",
+                    "workouts_count": "Workouts per poll (1-10)"
+                }
+            }
+        }
+    },
     "entity": {
         "sensor": {
             "workout_count": {"name": "Workout Count"},

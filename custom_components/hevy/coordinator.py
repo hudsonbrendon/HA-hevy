@@ -104,6 +104,7 @@ class HevyDataUpdateCoordinator(DataUpdateCoordinator):
         hass: HomeAssistant,
         name: str,
         update_interval: timedelta,
+        workouts_count: int = DEFAULT_WORKOUTS_COUNT,
     ) -> None:
         """Initialize the coordinator."""
         super().__init__(
@@ -115,6 +116,7 @@ class HevyDataUpdateCoordinator(DataUpdateCoordinator):
         self.name = name
         self.data: dict[str, Any] = {}
         self._primed = False
+        self._workouts_count = workouts_count
 
     async def _async_update_data(self) -> dict[str, Any]:
         """Update data via library."""
@@ -127,7 +129,7 @@ class HevyDataUpdateCoordinator(DataUpdateCoordinator):
                 measurements_data,
             ) = await asyncio.gather(
                 client.async_get_workout_count(),
-                client.async_get_workouts(page=1, page_size=DEFAULT_WORKOUTS_COUNT),
+                client.async_get_workouts(page=1, page_size=self._workouts_count),
                 self._safe_fetch(client.async_get_user_info()),
                 self._safe_fetch(client.async_get_body_measurements(page_size=10)),
             )
