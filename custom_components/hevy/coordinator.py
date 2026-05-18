@@ -158,11 +158,8 @@ class HevyDataUpdateCoordinator(DataUpdateCoordinator):
             return
         cursor = self._events_cursor or datetime.now(tz=UTC).isoformat()
         try:
-            response = (
-                await self.config_entry.runtime_data.client.async_get_workout_events(  # noqa: E501
-                    since=cursor
-                )
-            )
+            client = self.config_entry.runtime_data.client
+            response = await client.async_get_workout_events(since=cursor)
         except HevyApiClientError as err:
             LOGGER.debug("Workout events poll failed: %s", err)
             return
