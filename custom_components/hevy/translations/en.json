@@ -7,6 +7,12 @@
                     "api_key": "API Key",
                     "name": "Name"
                 }
+            },
+            "reauth_confirm": {
+                "description": "Your Hevy API key is no longer valid. Generate a new one in the Hevy web app under Account Settings → Developer, then paste it below.",
+                "data": {
+                    "api_key": "API Key"
+                }
             }
         },
         "error": {
@@ -15,7 +21,8 @@
             "unknown": "An unknown error occurred."
         },
         "abort": {
-            "already_configured": "This API key is already configured."
+            "already_configured": "This API key is already configured.",
+            "reauth_successful": "Re-authentication was successful."
         }
     },
     "options": {

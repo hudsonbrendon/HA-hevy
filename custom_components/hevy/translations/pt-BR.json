@@ -7,6 +7,12 @@
                     "api_key": "Chave API",
                     "name": "Nome"
                 }
+            },
+            "reauth_confirm": {
+                "description": "Sua chave de API do Hevy não é mais válida. Gere uma nova no app web do Hevy em Configurações da Conta → Desenvolvedor e cole abaixo.",
+                "data": {
+                    "api_key": "Chave API"
+                }
             }
         },
         "error": {
@@ -15,7 +21,8 @@
             "unknown": "Ocorreu um erro desconhecido."
         },
         "abort": {
-            "already_configured": "Esta chave de API já está configurada."
+            "already_configured": "Esta chave de API já está configurada.",
+            "reauth_successful": "Reautenticação concluída com sucesso."
         }
     },
     "options": {

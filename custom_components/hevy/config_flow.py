@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.helpers import selector
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
 
 from .api import (
     HevyApiClient,
@@ -87,6 +90,57 @@ class HevyFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 },
             ),
             errors=_errors,
+        )
+
+    async def async_step_reauth(
+        self,
+        entry_data: Mapping[str, Any],  # noqa: ARG002
+    ) -> config_entries.ConfigFlowResult:
+        """Handle a reauth triggered by ConfigEntryAuthFailed in the coordinator."""
+        return await self.async_step_reauth_confirm()
+
+    async def async_step_reauth_confirm(
+        self,
+        user_input: dict | None = None,
+    ) -> config_entries.ConfigFlowResult:
+        """Prompt the user for a fresh API key and update the existing entry."""
+        errors: dict[str, str] = {}
+        if user_input is not None:
+            try:
+                await self._test_credentials(api_key=user_input[CONF_API_KEY])
+            except HevyApiClientAuthenticationError as exception:
+                LOGGER.warning(exception)
+                errors["base"] = "auth"
+            except HevyApiClientCommunicationError as exception:
+                LOGGER.error(exception)
+                errors["base"] = "connection"
+            except HevyApiClientError as exception:
+                LOGGER.exception(exception)
+                errors["base"] = "unknown"
+            else:
+                entry = self.hass.config_entries.async_get_entry(
+                    self.context["entry_id"]
+                )
+                self.hass.config_entries.async_update_entry(
+                    entry,
+                    data={**entry.data, CONF_API_KEY: user_input[CONF_API_KEY]},
+                    unique_id=user_input[CONF_API_KEY],
+                )
+                await self.hass.config_entries.async_reload(entry.entry_id)
+                return self.async_abort(reason="reauth_successful")
+
+        return self.async_show_form(
+            step_id="reauth_confirm",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(CONF_API_KEY): selector.TextSelector(
+                        selector.TextSelectorConfig(
+                            type=selector.TextSelectorType.PASSWORD,
+                        ),
+                    ),
+                }
+            ),
+            errors=errors,
         )
 
     async def _test_credentials(self, api_key: str) -> None:
