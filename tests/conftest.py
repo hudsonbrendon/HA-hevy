@@ -125,6 +125,56 @@ class _StubCalendarEntity:
     pass
 
 
+class _StubConfigFlow:
+    """Minimal stand-in for config_entries.ConfigFlow."""
+
+    hass: Any = None
+    context: dict[str, Any]
+    VERSION: int = 1
+
+    def __init_subclass__(cls, **kwargs: Any) -> None:
+        # ConfigFlow uses `class HevyFlowHandler(ConfigFlow, domain="hevy"):`
+        # — accept and discard subclass kwargs in the stub.
+        super().__init_subclass__()
+
+    async def async_set_unique_id(self, unique_id: str) -> None:
+        self._unique_id = unique_id
+
+    def _abort_if_unique_id_configured(self) -> None:
+        pass
+
+    def async_show_form(self, **kwargs: Any) -> dict[str, Any]:
+        return {"type": "form", **kwargs}
+
+    def async_create_entry(self, **kwargs: Any) -> dict[str, Any]:
+        return {"type": "create_entry", **kwargs}
+
+    def async_abort(self, *, reason: str) -> dict[str, Any]:
+        return {"type": "abort", "reason": reason}
+
+
+class _StubOptionsFlow:
+    """Minimal stand-in for config_entries.OptionsFlow."""
+
+    def async_show_form(self, **kwargs: Any) -> dict[str, Any]:
+        return {"type": "form", **kwargs}
+
+    def async_create_entry(self, **kwargs: Any) -> dict[str, Any]:
+        return {"type": "create_entry", **kwargs}
+
+
+class _StubTextSelectorType:
+    TEXT = "text"
+    PASSWORD = "password"  # noqa: S105 (stub mirroring HA enum)
+
+
+def _passthrough_selector(*args: Any, **kwargs: Any) -> Any:
+    """Return a placeholder mirroring the args/kwargs for assertions."""
+    if args:
+        return args[0]
+    return kwargs
+
+
 @dataclass
 class _StubCalendarEvent:
     start: Any
@@ -212,7 +262,28 @@ def _install_ha_stubs() -> None:
         date=_parse_date,
     )
     _mod("homeassistant.core", HomeAssistant=object)
-    _mod("homeassistant.config_entries", ConfigEntry=object)
+    _mod(
+        "homeassistant.config_entries",
+        ConfigEntry=object,
+        ConfigFlow=_StubConfigFlow,
+        OptionsFlow=_StubOptionsFlow,
+        ConfigFlowResult=dict,
+    )
+    _mod(
+        "homeassistant",
+        config_entries=sys.modules["homeassistant.config_entries"],
+    )
+    _mod(
+        "homeassistant.helpers.selector",
+        TextSelector=_passthrough_selector,
+        TextSelectorConfig=_passthrough_selector,
+        TextSelectorType=_StubTextSelectorType,
+    )
+    _mod(
+        "homeassistant.helpers.aiohttp_client",
+        async_get_clientsession=lambda _hass: None,
+        async_create_clientsession=lambda _hass: None,
+    )
     _mod(
         "homeassistant.const",
         Platform=types.SimpleNamespace(
@@ -223,10 +294,6 @@ def _install_ha_stubs() -> None:
         PERCENTAGE="%",
         UnitOfMass=_StubUnitOfMass,
         UnitOfTime=_StubUnitOfTime,
-    )
-    _mod(
-        "homeassistant.helpers.aiohttp_client",
-        async_get_clientsession=lambda _hass: None,
     )
     _mod("homeassistant.loader", async_get_integration=lambda *a, **k: None)
     _pkg("homeassistant.components")
@@ -287,6 +354,7 @@ def _register_hevy_package() -> None:
         "calendar",
         "diagnostics",
         "services",
+        "config_flow",
     ):
         spec = importlib.util.spec_from_file_location(
             f"custom_components.hevy.{submodule}",
