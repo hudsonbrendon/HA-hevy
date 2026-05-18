@@ -9,6 +9,8 @@ from homeassistant.components.calendar import CalendarEntity, CalendarEvent
 
 from .entity import HevyEntity
 
+PARALLEL_UPDATES = 0
+
 if TYPE_CHECKING:
     from datetime import datetime
 
