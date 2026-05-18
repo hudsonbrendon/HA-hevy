@@ -3,14 +3,17 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
+from types import SimpleNamespace
 from typing import Any
-from unittest.mock import MagicMock
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
+from custom_components.hevy.api import HevyApiClientError
 from custom_components.hevy.const import (
     EVENT_WORKOUT_COMPLETED,
     EVENT_WORKOUT_DELETED,
+    EVENT_WORKOUT_UPDATED,
 )
 from custom_components.hevy.coordinator import (
     HevyDataUpdateCoordinator,
@@ -135,3 +138,92 @@ class TestFireWorkoutEvents:
             for c in coord_with_bus.hass.bus.async_fire.call_args_list
         }
         assert titles == {"A", "B", "C"}
+
+
+@pytest.fixture
+def coord_with_events_client() -> Any:
+    """Coordinator wired with hass.bus and a stubbed events-endpoint client."""
+    coord = HevyDataUpdateCoordinator.__new__(HevyDataUpdateCoordinator)
+    coord.name = "Hudson"
+    coord.hass = MagicMock()
+    coord.hass.bus = MagicMock()
+    client = MagicMock()
+    client.async_get_workout_events = AsyncMock()
+    coord.config_entry = SimpleNamespace(runtime_data=SimpleNamespace(client=client))
+    coord._primed = True
+    coord._events_cursor = "2026-05-17T11:00:00+00:00"
+    return coord
+
+
+@pytest.mark.asyncio
+class TestPollWorkoutUpdates:
+    async def test_fires_updated_for_cached_workouts(
+        self, coord_with_events_client: Any
+    ) -> None:
+        coord = coord_with_events_client
+        coord.config_entry.runtime_data.client.async_get_workout_events.return_value = {
+            "events": [
+                {"type": "updated", "workout": {"id": "w1"}},
+                {"type": "updated", "workout": {"id": "unknown"}},
+                {"type": "deleted", "id": "w2"},
+            ]
+        }
+
+        await coord._poll_workout_updates({"w1": _record("w1"), "w3": _record("w3")})
+
+        # Only w1 fires (cached); 'unknown' workout skipped; deleted skipped.
+        coord.hass.bus.async_fire.assert_called_once()
+        event, payload = coord.hass.bus.async_fire.call_args.args
+        assert event == EVENT_WORKOUT_UPDATED
+        assert payload["id"] == "w1"
+
+    async def test_first_run_seeds_cursor_and_skips(self) -> None:
+        coord = HevyDataUpdateCoordinator.__new__(HevyDataUpdateCoordinator)
+        coord.hass = MagicMock()
+        coord.hass.bus = MagicMock()
+        client = MagicMock()
+        client.async_get_workout_events = AsyncMock()
+        coord.config_entry = SimpleNamespace(
+            runtime_data=SimpleNamespace(client=client)
+        )
+        coord._primed = False
+        coord._events_cursor = None
+
+        await coord._poll_workout_updates({"w1": _record("w1")})
+
+        client.async_get_workout_events.assert_not_called()
+        coord.hass.bus.async_fire.assert_not_called()
+        assert coord._events_cursor is not None
+
+    async def test_api_error_does_not_crash(
+        self, coord_with_events_client: Any
+    ) -> None:
+        coord = coord_with_events_client
+        coord.config_entry.runtime_data.client.async_get_workout_events.side_effect = (
+            HevyApiClientError("boom")
+        )
+
+        # Must not raise — events poll is best-effort.
+        await coord._poll_workout_updates({"w1": _record("w1")})
+        coord.hass.bus.async_fire.assert_not_called()
+
+    async def test_advances_cursor_after_successful_poll(
+        self, coord_with_events_client: Any
+    ) -> None:
+        coord = coord_with_events_client
+        before = coord._events_cursor
+        coord.config_entry.runtime_data.client.async_get_workout_events.return_value = {
+            "events": []
+        }
+        await coord._poll_workout_updates({})
+        assert coord._events_cursor != before
+
+    async def test_no_updated_events_no_fires(
+        self, coord_with_events_client: Any
+    ) -> None:
+        coord = coord_with_events_client
+        coord.config_entry.runtime_data.client.async_get_workout_events.return_value = {
+            "events": [{"type": "deleted", "id": "w1"}]
+        }
+        await coord._poll_workout_updates({"w1": _record("w1")})
+        coord.hass.bus.async_fire.assert_not_called()

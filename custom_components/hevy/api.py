@@ -60,6 +60,19 @@ class HevyApiClient:
             "api-key": api_key,
         }
 
+    async def async_get_workout_events(
+        self,
+        since: str,
+        page: int = 1,
+        page_size: int = 10,
+    ) -> dict[str, Any]:
+        """Get workout events (updates + deletes) since ISO 8601 timestamp."""
+        return await self._api_wrapper(
+            method="get",
+            url=f"{BASE_URL}/workouts/events",
+            params={"since": since, "page": page, "pageSize": page_size},
+        )
+
     async def async_get_workout_count(self) -> dict[str, Any]:
         """Get workout count from the API."""
         return await self._api_wrapper(

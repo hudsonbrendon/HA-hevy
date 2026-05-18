@@ -23,3 +23,4 @@ MAX_WORKOUTS_COUNT = 10  # Hevy API hard cap
 
 EVENT_WORKOUT_COMPLETED = "hevy_workout_completed"
 EVENT_WORKOUT_DELETED = "hevy_workout_deleted"
+EVENT_WORKOUT_UPDATED = "hevy_workout_updated"
