@@ -9,7 +9,7 @@
                 }
             },
             "reauth_confirm": {
-                "description": "Sua chave de API do Hevy não é mais válida. Gere uma nova em https://hevy.com/settings?developer e cole abaixo.",
+                "description": "Sua chave de API do Hevy não é mais válida. Gere uma nova no app web do Hevy em Configurações da Conta → Desenvolvedor e cole abaixo.",
                 "data": {
                     "api_key": "Chave API"
                 }

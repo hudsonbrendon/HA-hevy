@@ -9,7 +9,7 @@
                 }
             },
             "reauth_confirm": {
-                "description": "Your Hevy API key is no longer valid. Generate a new one at https://hevy.com/settings?developer and paste it below.",
+                "description": "Your Hevy API key is no longer valid. Generate a new one in the Hevy web app under Account Settings → Developer, then paste it below.",
                 "data": {
                     "api_key": "API Key"
                 }
