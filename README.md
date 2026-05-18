@@ -199,6 +199,14 @@ entities:
 | Calendar empty | Only the 10 most recent workouts are cached. Train more 😉. |
 | Events don't fire | First refresh after restart is silent. Wait one poll cycle (default 60 min). |
 
+## Removal
+
+1. **Settings → Devices & Services → Hevy → ⋮ → Delete** — removes all entities and the config entry.
+2. If installed via HACS, also remove the integration from **HACS → Integrations** to stop receiving updates.
+3. For manual installs, delete the `custom_components/hevy/` directory and restart Home Assistant.
+
+Your Hevy account data is not touched. Revoke the API key at <https://hevy.com/settings?developer> if you no longer want HA to access it.
+
 ## Contributing
 
 Issues and PRs welcome. The repo has:

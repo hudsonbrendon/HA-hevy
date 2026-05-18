@@ -15,6 +15,8 @@ from homeassistant.helpers.entity import EntityCategory
 
 from .entity import HevyEntity
 
+PARALLEL_UPDATES = 0
+
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
     from homeassistant.helpers.entity_platform import AddEntitiesCallback

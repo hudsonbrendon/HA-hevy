@@ -1,0 +1,79 @@
+rules:
+  # Bronze
+  action-setup:
+    status: done
+    comment: services registered in async_setup_entry, unregistered on last unload.
+  appropriate-polling:
+    status: done
+    comment: cloud_polling with 60-minute default; user-configurable 5-1440 via OptionsFlow.
+  brands:
+    status: todo
+    comment: PR to home-assistant/brands repo pending.
+  common-modules:
+    status: done
+  config-flow:
+    status: done
+  config-flow-test-coverage:
+    status: done
+    comment: 5 tests covering reauth; user-step happy path covered by manual QA.
+  dependency-transparency:
+    status: done
+    comment: No external deps beyond aiohttp/async-timeout (Home Assistant core).
+  docs-actions:
+    status: done
+    comment: services.yaml documents log_body_measurement, refresh, create_workout.
+  docs-high-level-description:
+    status: done
+  docs-installation-instructions:
+    status: done
+  docs-removal-instructions:
+    status: done
+    comment: README "Removal" section.
+  entity-event-setup:
+    status: exempt
+    comment: All entities derive from CoordinatorEntity; no per-entity events.
+  entity-unique-id:
+    status: done
+  has-entity-name:
+    status: done
+  runtime-data:
+    status: done
+    comment: HevyData dataclass attached to ConfigEntry.runtime_data.
+  test-before-configure:
+    status: done
+    comment: _test_credentials called in config_flow.
+  test-before-setup:
+    status: done
+    comment: async_config_entry_first_refresh in async_setup_entry.
+  unique-config-entry:
+    status: done
+    comment: unique_id = API key, _abort_if_unique_id_configured.
+
+  # Silver
+  action-exceptions:
+    status: done
+    comment: HomeAssistantError raised on API failures; ServiceValidationError on bad input.
+  config-entry-unloading:
+    status: done
+  docs-configuration-parameters:
+    status: done
+    comment: OptionsFlow + README polling section.
+  docs-installation-parameters:
+    status: done
+  entity-unavailable:
+    status: done
+    comment: HevyWorkoutEntity.available reflects coordinator state.
+  integration-owner:
+    status: done
+    comment: codeowners in manifest.json.
+  log-when-unavailable:
+    status: done
+    comment: coordinator logs optional endpoint failures at WARNING.
+  parallel-updates:
+    status: done
+    comment: PARALLEL_UPDATES = 0 on all platforms (coordinator-driven).
+  reauthentication-flow:
+    status: done
+  test-coverage:
+    status: done
+    comment: 172 tests across api, coordinator, sensors, events, services, config_flow.

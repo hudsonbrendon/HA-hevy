@@ -15,6 +15,9 @@ from homeassistant.const import PERCENTAGE, UnitOfMass, UnitOfTime
 
 from .entity import HevyEntity, HevyWorkoutEntity
 
+# All sensors share one coordinator so a single concurrent refresh is enough.
+PARALLEL_UPDATES = 0
+
 if TYPE_CHECKING:
     from datetime import datetime
 
