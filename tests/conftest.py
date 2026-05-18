@@ -132,6 +132,25 @@ def _device_info(**kwargs: Any) -> dict[str, Any]:
     return dict(kwargs)
 
 
+_REDACTED = "**REDACTED**"
+
+
+def _async_redact_data(data: Any, to_redact: set[str]) -> Any:
+    """Mirror of HA's async_redact_data helper for tests (recursive)."""
+    if isinstance(data, dict):
+        return {
+            key: (
+                _REDACTED
+                if key in to_redact and value is not None
+                else _async_redact_data(value, to_redact)
+            )
+            for key, value in data.items()
+        }
+    if isinstance(data, list):
+        return [_async_redact_data(item, to_redact) for item in data]
+    return data
+
+
 def _install_ha_stubs() -> None:
     """Insert minimal Home Assistant modules into sys.modules."""
 
@@ -207,6 +226,10 @@ def _install_ha_stubs() -> None:
         CalendarEntity=_StubCalendarEntity,
         CalendarEvent=_StubCalendarEvent,
     )
+    _mod(
+        "homeassistant.components.diagnostics",
+        async_redact_data=_async_redact_data,
+    )
 
 
 _install_ha_stubs()
@@ -240,6 +263,7 @@ def _register_hevy_package() -> None:
         "sensor",
         "binary_sensor",
         "calendar",
+        "diagnostics",
     ):
         spec = importlib.util.spec_from_file_location(
             f"custom_components.hevy.{submodule}",

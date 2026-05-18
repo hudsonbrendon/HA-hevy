@@ -8,7 +8,14 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.loader import async_get_integration
 
 from .api import HevyApiClient
-from .const import CONF_API_KEY, CONF_NAME, DEFAULT_SCAN_INTERVAL
+from .const import (
+    CONF_API_KEY,
+    CONF_NAME,
+    CONF_SCAN_INTERVAL,
+    CONF_WORKOUTS_COUNT,
+    DEFAULT_SCAN_INTERVAL,
+    DEFAULT_WORKOUTS_COUNT,
+)
 from .coordinator import HevyDataUpdateCoordinator
 from .data import HevyData
 
@@ -31,10 +38,13 @@ async def async_setup_entry(
     entry: HevyConfigEntry,
 ) -> bool:
     """Set up this integration using UI."""
+    scan_minutes = entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
+    workouts_count = entry.options.get(CONF_WORKOUTS_COUNT, DEFAULT_WORKOUTS_COUNT)
     coordinator = HevyDataUpdateCoordinator(
         hass=hass,
         name=entry.data[CONF_NAME],
-        update_interval=timedelta(minutes=DEFAULT_SCAN_INTERVAL),
+        update_interval=timedelta(minutes=scan_minutes),
+        workouts_count=workouts_count,
     )
     entry.runtime_data = HevyData(
         client=HevyApiClient(
