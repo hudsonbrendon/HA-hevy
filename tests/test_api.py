@@ -84,6 +84,21 @@ class TestEndpointDispatch:
         assert kwargs["params"] == {"page": 3, "pageSize": 10}
         assert kwargs["url"].endswith("/body_measurements")
 
+    async def test_workout_events_endpoint_passes_since(self) -> None:
+        response = _build_response(json_payload={"events": [], "page": 1})
+        session = _build_session(response)
+        client = HevyApiClient(api_key="key", session=session)
+
+        await client.async_get_workout_events(since="2026-05-17T00:00:00Z")
+
+        kwargs = session.request.await_args.kwargs
+        assert kwargs["params"] == {
+            "since": "2026-05-17T00:00:00Z",
+            "page": 1,
+            "pageSize": 10,
+        }
+        assert kwargs["url"].endswith("/workouts/events")
+
 
 @pytest.mark.asyncio
 class TestErrorHandling:

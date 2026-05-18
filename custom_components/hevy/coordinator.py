@@ -19,6 +19,7 @@ from .const import (
     DOMAIN,
     EVENT_WORKOUT_COMPLETED,
     EVENT_WORKOUT_DELETED,
+    EVENT_WORKOUT_UPDATED,
     LOGGER,
 )
 
@@ -117,6 +118,7 @@ class HevyDataUpdateCoordinator(DataUpdateCoordinator):
         self.data: dict[str, Any] = {}
         self._primed = False
         self._workouts_count = workouts_count
+        self._events_cursor: str | None = None
 
     async def _async_update_data(self) -> dict[str, Any]:
         """Update data via library."""
@@ -143,8 +145,33 @@ class HevyDataUpdateCoordinator(DataUpdateCoordinator):
             workout_count_data, workouts_data, user_data, measurements_data
         )
         self._fire_workout_events(previous_workouts, new_state["workouts"])
+        await self._poll_workout_updates(new_state["workouts"])
         self._primed = True
         return new_state
+
+    async def _poll_workout_updates(self, workouts: dict[str, dict[str, Any]]) -> None:
+        """Query the events endpoint and fire `hevy_workout_updated` for changes."""
+        if not self._primed:
+            # First refresh — seed cursor to "now" so the next poll only sees
+            # genuinely-new events instead of replaying the workout history.
+            self._events_cursor = datetime.now(tz=UTC).isoformat()
+            return
+        cursor = self._events_cursor or datetime.now(tz=UTC).isoformat()
+        try:
+            client = self.config_entry.runtime_data.client
+            response = await client.async_get_workout_events(since=cursor)
+        except HevyApiClientError as err:
+            LOGGER.debug("Workout events poll failed: %s", err)
+            return
+        for event in response.get("events", []):
+            if event.get("type") != "updated":
+                continue
+            workout_id = (event.get("workout") or {}).get("id")
+            if workout_id and workout_id in workouts:
+                self.hass.bus.async_fire(
+                    EVENT_WORKOUT_UPDATED, _event_payload(workouts[workout_id])
+                )
+        self._events_cursor = datetime.now(tz=UTC).isoformat()
 
     def _fire_workout_events(
         self,
@@ -289,6 +316,7 @@ class HevyDataUpdateCoordinator(DataUpdateCoordinator):
             "title": workout["title"],
             "start_time": start_time,
             "_end_time_raw": workout.get("end_time"),
+            "updated_at": workout.get("updated_at"),
             "exercises": exercises_data,
             "volume_kg": volume_kg,
             "total_reps": total_reps,
