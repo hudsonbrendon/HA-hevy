@@ -9,7 +9,7 @@ from __future__ import annotations
 import sys
 import types
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Any
 
@@ -53,6 +53,14 @@ class _StubUpdateFailed(Exception):
 
 class _StubConfigEntryAuthFailed(Exception):
     """Stub for ConfigEntryAuthFailed."""
+
+
+class _StubHomeAssistantError(Exception):
+    """Stub for HomeAssistantError."""
+
+
+class _StubServiceValidationError(_StubHomeAssistantError):
+    """Stub for ServiceValidationError."""
 
 
 class _StubEntityCategory:
@@ -132,6 +140,13 @@ def _device_info(**kwargs: Any) -> dict[str, Any]:
     return dict(kwargs)
 
 
+def _parse_date(value: Any) -> Any:
+    """Minimal cv.date stand-in (passes through date/datetime, parses str)."""
+    if isinstance(value, datetime | date):
+        return value
+    return datetime.strptime(str(value), "%Y-%m-%d").replace(tzinfo=UTC).date()
+
+
 _REDACTED = "**REDACTED**"
 
 
@@ -173,6 +188,8 @@ def _install_ha_stubs() -> None:
     _mod(
         "homeassistant.exceptions",
         ConfigEntryAuthFailed=_StubConfigEntryAuthFailed,
+        HomeAssistantError=_StubHomeAssistantError,
+        ServiceValidationError=_StubServiceValidationError,
     )
     _pkg("homeassistant.helpers")
     _mod(
@@ -188,6 +205,11 @@ def _install_ha_stubs() -> None:
     _mod(
         "homeassistant.helpers.entity",
         EntityCategory=_StubEntityCategory,
+    )
+    _mod(
+        "homeassistant.helpers.config_validation",
+        string=str,
+        date=_parse_date,
     )
     _mod("homeassistant.core", HomeAssistant=object)
     _mod("homeassistant.config_entries", ConfigEntry=object)
@@ -264,6 +286,7 @@ def _register_hevy_package() -> None:
         "binary_sensor",
         "calendar",
         "diagnostics",
+        "services",
     ):
         spec = importlib.util.spec_from_file_location(
             f"custom_components.hevy.{submodule}",

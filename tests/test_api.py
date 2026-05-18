@@ -12,6 +12,7 @@ from custom_components.hevy.api import (
     HevyApiClient,
     HevyApiClientAuthenticationError,
     HevyApiClientCommunicationError,
+    HevyApiClientConflictError,
     HevyApiClientError,
 )
 
@@ -22,7 +23,7 @@ def _build_response(*, status: int = 200, json_payload: Any = None) -> MagicMock
     response.status = status
     response.json = AsyncMock(return_value=json_payload or {})
     response.raise_for_status = MagicMock()
-    if status >= 400 and status not in (401, 403):
+    if status >= 400 and status not in (401, 403, 409):
         response.raise_for_status.side_effect = aiohttp.ClientResponseError(
             request_info=MagicMock(),
             history=(),
@@ -101,6 +102,13 @@ class TestErrorHandling:
 
         with pytest.raises(HevyApiClientAuthenticationError):
             await client.async_get_workout_count()
+
+    async def test_409_raises_conflict_error(self) -> None:
+        response = _build_response(status=409)
+        session = _build_session(response)
+        client = HevyApiClient(api_key="key", session=session)
+        with pytest.raises(HevyApiClientConflictError):
+            await client.async_create_body_measurement({"date": "2026-05-17"})
 
     async def test_500_raises_communication_error(self) -> None:
         response = _build_response(status=500)

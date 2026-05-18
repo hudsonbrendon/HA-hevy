@@ -18,6 +18,7 @@ from .const import (
 )
 from .coordinator import HevyDataUpdateCoordinator
 from .data import HevyData
+from .services import async_register_services, async_unregister_services
 
 if TYPE_CHECKING:
     from .data import HevyConfigEntry
@@ -60,6 +61,7 @@ async def async_setup_entry(
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(async_reload_entry))
+    async_register_services(hass)
 
     return True
 
@@ -69,7 +71,9 @@ async def async_unload_entry(
     entry: HevyConfigEntry,
 ) -> bool:
     """Handle removal of an entry."""
-    return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+    unloaded = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+    async_unregister_services(hass)
+    return unloaded
 
 
 async def async_reload_entry(

@@ -27,13 +27,20 @@ class HevyApiClientAuthenticationError(
     """Exception to indicate an authentication error."""
 
 
+class HevyApiClientConflictError(
+    HevyApiClientError,
+):
+    """Exception to indicate the server reported a duplicate (HTTP 409)."""
+
+
 def _verify_response_or_raise(response: aiohttp.ClientResponse) -> None:
     """Verify that the response is valid."""
     if response.status in (401, 403):
         msg = "Invalid API key"
-        raise HevyApiClientAuthenticationError(
-            msg,
-        )
+        raise HevyApiClientAuthenticationError(msg)
+    if response.status == 409:
+        msg = "Resource already exists for the given key"
+        raise HevyApiClientConflictError(msg)
     response.raise_for_status()
 
 
@@ -85,6 +92,26 @@ class HevyApiClient:
             method="get",
             url=f"{BASE_URL}/body_measurements",
             params={"page": page, "pageSize": page_size},
+        )
+
+    async def async_create_body_measurement(
+        self, body: dict[str, Any]
+    ) -> dict[str, Any]:
+        """POST a new body measurement. Returns 409 if entry exists for date."""
+        return await self._api_wrapper(
+            method="post",
+            url=f"{BASE_URL}/body_measurements",
+            data=body,
+        )
+
+    async def async_update_body_measurement(
+        self, date: str, body: dict[str, Any]
+    ) -> dict[str, Any]:
+        """PUT (overwrite) body measurement for a given YYYY-MM-DD date."""
+        return await self._api_wrapper(
+            method="put",
+            url=f"{BASE_URL}/body_measurements/{date}",
+            data=body,
         )
 
     async def _api_wrapper(
