@@ -117,6 +117,14 @@ class HevyApiClient:
             data=body,
         )
 
+    async def async_create_workout(self, body: dict[str, Any]) -> dict[str, Any]:
+        """POST a new workout."""
+        return await self._api_wrapper(
+            method="post",
+            url=f"{BASE_URL}/workouts",
+            data=body,
+        )
+
     async def async_update_body_measurement(
         self, date: str, body: dict[str, Any]
     ) -> dict[str, Any]:
