@@ -1,4 +1,4 @@
-"""Constants for Hevy integration."""
+"""Constants for Hevy integration."""  # noqa: CPY001
 
 from logging import Logger, getLogger
 

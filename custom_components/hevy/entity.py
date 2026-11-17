@@ -1,4 +1,4 @@
-"""HevyEntity class."""
+"""HevyEntity class."""  # noqa: CPY001
 
 from __future__ import annotations
 

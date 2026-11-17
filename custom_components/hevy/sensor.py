@@ -1,4 +1,4 @@
-"""Sensor platform for hevy."""
+"""Sensor platform for hevy."""  # noqa: CPY001
 
 from __future__ import annotations
 

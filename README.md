@@ -1,12 +1,17 @@
+<p align="center">
+  <img src="custom_components/hevy/brand/icon@2x.png" alt="Hevy" height="128">
+</p>
+
 # Hevy Integration for Home Assistant
 
-[![Lint](https://github.com/hudsonbrendon/HA-hevy/actions/workflows/lint.yml/badge.svg)](https://github.com/hudsonbrendon/HA-hevy/actions/workflows/lint.yml)
-[![Test](https://github.com/hudsonbrendon/HA-hevy/actions/workflows/test.yml/badge.svg)](https://github.com/hudsonbrendon/HA-hevy/actions/workflows/test.yml)
-[![Validate](https://github.com/hudsonbrendon/HA-hevy/actions/workflows/validate.yml/badge.svg)](https://github.com/hudsonbrendon/HA-hevy/actions/workflows/validate.yml)
-[![HACS](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/hacs/integration)
-[![Release](https://img.shields.io/github/release/hudsonbrendon/HA-hevy.svg)](https://github.com/hudsonbrendon/HA-hevy/releases)
-
-![Hevy Logo](logo.png)
+[![Tests](https://github.com/hudsonbrendon/HA-hevy/actions/workflows/tests.yml/badge.svg)](https://github.com/hudsonbrendon/HA-hevy/actions/workflows/tests.yml)
+[![Hassfest](https://github.com/hudsonbrendon/HA-hevy/actions/workflows/hassfest.yml/badge.svg)](https://github.com/hudsonbrendon/HA-hevy/actions/workflows/hassfest.yml)
+[![HACS](https://github.com/hudsonbrendon/HA-hevy/actions/workflows/validate.yml/badge.svg)](https://github.com/hudsonbrendon/HA-hevy/actions/workflows/validate.yml)
+[![Release](https://img.shields.io/github/v/release/hudsonbrendon/HA-hevy?sort=semver)](https://github.com/hudsonbrendon/HA-hevy/releases)
+[![Downloads](https://img.shields.io/github/downloads/hudsonbrendon/HA-hevy/total)](https://github.com/hudsonbrendon/HA-hevy/releases)
+[![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://hacs.xyz/)
+[![Home Assistant](https://img.shields.io/badge/Home%20Assistant-2024.6.0%2B-18BCF2?logo=homeassistant&logoColor=white)](https://www.home-assistant.io/)
+[![License](https://img.shields.io/github/license/hudsonbrendon/HA-hevy)](LICENSE)
 
 Bring your [Hevy](https://hevy.com) workout tracker into Home Assistant: dashboards, automations, calendar, and event triggers for every completed lift.
 
@@ -15,6 +20,9 @@ Bring your [Hevy](https://hevy.com) workout tracker into Home Assistant: dashboa
 ---
 
 ## Installation
+
+[![Open in HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=hudsonbrendon&repository=HA-hevy&category=integration)
+[![Add integration](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=hevy)
 
 ### HACS (recommended)
 

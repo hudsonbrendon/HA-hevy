@@ -1,4 +1,4 @@
-"""Diagnostics support for Hevy integration."""
+"""Diagnostics support for Hevy integration."""  # noqa: CPY001
 
 from __future__ import annotations
 

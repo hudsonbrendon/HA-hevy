@@ -1,4 +1,4 @@
-"""DataUpdateCoordinator for hevy."""
+"""DataUpdateCoordinator for hevy."""  # noqa: CPY001
 
 from __future__ import annotations
 

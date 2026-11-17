@@ -1,4 +1,4 @@
-"""Service handlers for the Hevy integration."""
+"""Service handlers for the Hevy integration."""  # noqa: CPY001
 
 from __future__ import annotations
 

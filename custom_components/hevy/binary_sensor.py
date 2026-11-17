@@ -1,4 +1,4 @@
-"""Binary sensor platform for hevy."""
+"""Binary sensor platform for hevy."""  # noqa: CPY001
 
 from __future__ import annotations
 

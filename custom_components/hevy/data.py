@@ -1,4 +1,4 @@
-"""Custom types for hevy."""
+"""Custom types for hevy."""  # noqa: CPY001
 
 from __future__ import annotations
 

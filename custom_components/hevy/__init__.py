@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta  # noqa: CPY001
 from typing import TYPE_CHECKING
 
 from homeassistant.config_entries import ConfigEntry

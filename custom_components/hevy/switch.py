@@ -1,4 +1,4 @@
-"""Switch platform for HA hevy."""
+"""Switch platform for HA hevy."""  # noqa: CPY001
 
 from __future__ import annotations
 

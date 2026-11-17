@@ -1,4 +1,4 @@
-"""Adds config flow for Hevy."""
+"""Adds config flow for Hevy."""  # noqa: CPY001
 
 from __future__ import annotations
 
