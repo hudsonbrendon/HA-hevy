@@ -1,0 +1,6 @@
+# Tests stub out Home Assistant (see tests/conftest.py), so HA itself and
+# pytest-homeassistant-custom-component must NOT be installed here.
+pytest>=8.3
+pytest-asyncio>=0.25
+aiohttp>=3.11
+voluptuous>=0.15
